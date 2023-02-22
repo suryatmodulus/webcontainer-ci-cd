@@ -1,6 +1,11 @@
 import './style.css';
 import { WebContainer } from '@webcontainer/api';
 import { files } from './files';
+import { Terminal } from 'xterm';
+import 'xterm/css/xterm.css';
+
+/** @type {import('xterm').Terminal}  */
+let term;
 
 /** @type {import('@webcontainer/api').WebContainer}  */
 let webcontainerInstance;
@@ -8,20 +13,11 @@ let webcontainerInstance;
 window.addEventListener('load', async () => {
   // Call only once
   webcontainerInstance = await WebContainer.boot();
-
   await webcontainerInstance.mount(files);
-  await installDependencies();
-  await gitClone();
-  await installClonedProjectDependencies();
-  await buildClonedProject();
-  await listFiles();
-  await startDevServer();
-  // if (iprocess.exit !== 0) {
-  //   throw new Error('Installation failed');
-  // }
+  await installCoreDependencies();
 });
 
-async function installDependencies() {
+async function installCoreDependencies() {
   // Install dependencies
   const iProcess = await webcontainerInstance.spawn('npm', ['install']);
   iProcess.output.pipeTo(
@@ -33,6 +29,24 @@ async function installDependencies() {
   );
   // Wait for install command to exit
   return iProcess.exit;
+}
+
+document.getElementById('github-input').addEventListener('change', async () => {
+  await runApp();
+});
+
+async function runApp() {
+  setUpTerminal();
+  await gitClone();
+  await installProjectDependencies();
+  await buildProject();
+  await listFiles();
+  await startDevServer();
+}
+
+function setUpTerminal() {
+  term = new Terminal({ convertEol: true });
+  term.open(document.getElementById('terminal'));
 }
 
 async function gitClone() {
@@ -47,6 +61,7 @@ async function gitClone() {
     new WritableStream({
       write(data) {
         console.log(data);
+        term.write(data);
       },
     })
   );
@@ -54,7 +69,7 @@ async function gitClone() {
   return iProcess.exit;
 }
 
-async function installClonedProjectDependencies() {
+async function installProjectDependencies() {
   // Install dependencies
   const iProcess = await webcontainerInstance.spawn('npm', [
     '--prefix',
@@ -65,6 +80,7 @@ async function installClonedProjectDependencies() {
     new WritableStream({
       write(data) {
         console.log(data);
+        term.write(data);
       },
     })
   );
@@ -72,7 +88,7 @@ async function installClonedProjectDependencies() {
   return iProcess.exit;
 }
 
-async function buildClonedProject() {
+async function buildProject() {
   // Install dependencies
   const iProcess = await webcontainerInstance.spawn('npm', [
     '--prefix',
@@ -84,6 +100,7 @@ async function buildClonedProject() {
     new WritableStream({
       write(data) {
         console.log(data);
+        term.write(data);
       },
     })
   );
@@ -101,6 +118,7 @@ async function listFiles() {
     new WritableStream({
       write(data) {
         console.log(data);
+        term.write(data);
       },
     })
   );
@@ -120,14 +138,6 @@ async function startDevServer() {
     iframeEl.src = url;
   });
 }
-
-document.querySelector('#app').innerHTML = `
-  <div class="container">
-    <div class="preview">
-      <iframe src="loading.html"></iframe>
-    </div>
-  </div>
-`;
 
 /** @type {HTMLIFrameElement | null} */
 const iframeEl = document.querySelector('iframe');

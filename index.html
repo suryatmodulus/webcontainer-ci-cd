@@ -2,20 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/stackblitz-favicon-editor.png" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/stackblitz-favicon-editor.png"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My first WebContainers app</title>
+    <!-- <script src="
+https://cdn.jsdelivr.net/npm/xterm@5.1.0/lib/xterm.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/xterm@5.1.0/css/xterm.min.css
+" rel="stylesheet"> -->
+    <title>Webcontainers CI-CD</title>
   </head>
   <body>
-    <header>
-      <h1>Hello, <span class="wc">WebContainers API</span>!</h1>
-      <p>
-        <a class="docs" href="https://webcontainers.io" target="_blank" rel="noreferrer noopener">
-          Read the docs 📖
-        </a>
-      </p>
-    </header>
-    <div id="app"></div>
+    <div>
+      <input id="github-input" type="text" placeholder="Enter github url" />
+    </div>
+    <div class="container">
+      <div id="terminal"></div>
+      <div class="preview">
+        <iframe src="loading.html"></iframe>
+      </div>
+    </div>
     <script type="module" src="/main.js"></script>
   </body>
 </html>
